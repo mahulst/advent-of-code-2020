@@ -1,7 +1,7 @@
+use regex::Regex;
 use std::fs::File;
 use std::io::Read;
 use std::str::FromStr;
-use regex::Regex;
 
 fn main() {
     let input = open_file("./src/input.txt");
@@ -9,11 +9,13 @@ fn main() {
     let mut valid_passwords = 0;
 
     input.lines().for_each(|line| {
-       let p: PasswordPolicy = line.parse().unwrap();
+        let p: PasswordPolicy = line.parse().unwrap();
 
-        let count: i32 = p.password.chars().filter(|c| c == &p.char).count() as i32;
+        let first = p.password.chars().nth(p.min as usize - 1).unwrap_or('!');
+        let second = p.password.chars().nth(p.max as usize - 1).unwrap_or('!');
 
-        if(count >= p.min && count <= p.max) {
+        let one_matches = [first, second].iter().filter(|c| **c == p.char).count() == 1;
+        if (one_matches) {
             valid_passwords += 1;
         }
     });
@@ -26,15 +28,15 @@ pub struct PasswordPolicy {
     pub min: i32,
     pub max: i32,
     pub char: char,
-    pub password: String
+    pub password: String,
 }
-
 
 impl FromStr for PasswordPolicy {
     type Err = ();
     fn from_str(input: &str) -> Result<PasswordPolicy, ()> {
         let re =
-            Regex::new(r"(?P<min>\d*)-(?P<max>\d*) (?P<character>[a-z]): (?P<password>[a-z]*)").unwrap();
+            Regex::new(r"(?P<min>\d*)-(?P<max>\d*) (?P<character>[a-z]): (?P<password>[a-z]*)")
+                .unwrap();
 
         match re.captures(input) {
             Some(caps) => {
@@ -47,7 +49,7 @@ impl FromStr for PasswordPolicy {
 
                 Ok(result)
             }
-            None => Err(())
+            None => Err(()),
         }
     }
 }

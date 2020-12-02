@@ -6,12 +6,21 @@ fn main() {
 
     input.lines().for_each(|line| {
         input.lines().for_each(|line2| {
-            if(line.parse::<i32>().unwrap() + line2.parse::<i32>().unwrap() == 2020) {
-                dbg!(line.parse::<i32>().unwrap() * line2.parse::<i32>().unwrap());
-            }
+            input.lines().for_each(|line3| {
+                if (line.parse::<i32>().unwrap()
+                    + line2.parse::<i32>().unwrap()
+                    + line3.parse::<i32>().unwrap()
+                    == 2020)
+                {
+                    dbg!(
+                        line.parse::<i32>().unwrap()
+                            * line2.parse::<i32>().unwrap()
+                            * line3.parse::<i32>().unwrap()
+                    );
+                }
+            });
         });
-
-        });
+    });
 }
 
 fn open_file(filename: &str) -> String {

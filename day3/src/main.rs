@@ -15,6 +15,17 @@ fn main() {
         }).collect()
     };
 
+    let count0 = count_trees(&tree_pattern,  1,  1);
+    let count1 = count_trees(&tree_pattern,  3,  1);
+    let count2 = count_trees(&tree_pattern,  5,  1);
+    let count3 = count_trees(&tree_pattern,  7,  1);
+    let count4 = count_trees(&tree_pattern,  1,  2);
+
+    dbg!(count0 * count1 * count2 * count3 * count4);
+
+}
+
+fn count_trees(tree_pattern: &TreePattern, x_dist: usize, y_dist: usize) -> usize {
     let mut y: usize = 0;
     let mut x: usize = 0;
     let length = tree_pattern.lines.iter().count();
@@ -23,14 +34,13 @@ fn main() {
     while y < length {
         let line = &tree_pattern.lines[y];
         let place = line.get_x(x);
-        if(*place == Tree) {
+        if (*place == Tree) {
             count += 1;
         }
-        y += 1;
-        x += 3;
+        y += y_dist;
+        x += x_dist;
     }
-    dbg!(count);
-
+    count
 }
 
 #[derive(Debug, PartialEq, Clone)]

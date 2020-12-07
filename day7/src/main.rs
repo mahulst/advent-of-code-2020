@@ -16,35 +16,49 @@ fn main() {
     });
     let needle_bag: &BagColor = &"shiny gold".to_string();
 
-   let a = bags.iter().fold(0 as usize, |amount, (bc, bb)| {
-        if needle_bag != bc {
-            let a = amount_of_bags(&bags, needle_bag, bc);
-            if a > 0 {
-                amount + 1
-            } else {
-                amount
-            }
-        } else {
-            amount
-        }
-    });
+    let recursive_bags = amount_of_bags(&bags, needle_bag, 0);
+    // shiny gold bag must not be counted, fold the bags it contains to a total
+    let total = recursive_bags
+        .contains
+        .iter()
+        .fold(0, |total, bag| calc_recursive(&bag, 1) + total);
 
-    dbg!(a);
+    dbg!(total);
+}
+
+fn calc_recursive(bag: &RecursiveBag, amount: usize) -> usize {
+    if bag.contains.is_empty() {
+        bag.amount
+    } else {
+        let contains_total = bag
+            .contains
+            .iter()
+            .fold(0, |total, amt| calc_recursive(amt, bag.amount) + total);
+
+        // plus one time the amount of bags inside the parent
+        contains_total * bag.amount + bag.amount
+    }
 }
 
 fn amount_of_bags(
     all_bags: &HashMap<BagColor, Bag>,
-    needle_bag: &BagColor,
     thread_bag: &BagColor,
-) -> usize {
+    amount: usize,
+) -> RecursiveBag {
     let bag = all_bags.get(thread_bag).unwrap();
-    bag.holds.iter().fold(0, |total, (bag, amount)| {
-        if bag == needle_bag {
-            total + amount
-        } else {
-            amount_of_bags(all_bags, needle_bag, bag) + total
-        }
-    })
+    let contains: Vec<RecursiveBag> = bag
+        .holds
+        .iter()
+        .map(|(bag, amt)| amount_of_bags(all_bags, bag, *amt))
+        .collect();
+
+    RecursiveBag { amount, contains }
+}
+
+#[derive(Debug, Clone)]
+pub struct RecursiveBag {
+    amount: usize,
+    contains: Vec<RecursiveBag>,
 }
 
 type BagColor = String;
